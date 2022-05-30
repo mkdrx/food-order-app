@@ -1,9 +1,9 @@
 import React, { useContext } from "react";
 
-import CartContext from "../../store/cart-context";
 import Modal from "../UI/Modal";
 import CartItem from "./CartItem";
 import classes from "./Cart.module.css";
+import CartContext from "../../store/cart-context";
 
 const Cart = (props) => {
   // Using context
@@ -15,11 +15,13 @@ const Cart = (props) => {
   // Checking if cart is empty or not - to render the button if true
   const hasItems = cartCtx.items.length > 0;
 
-  // Add - remove handlers
+  const cartItemRemoveHandler = (id) => {
+    cartCtx.removeItem(id);
+  };
 
-  const cartItemAddHandler = (item) => {};
-
-  const cartItemRemoveHandler = (id) => {};
+  const cartItemAddHandler = (item) => {
+    cartCtx.addItem({ ...item, amount: 1 });
+  };
 
   const cartItems = (
     <ul className={classes["cart-items"]}>
