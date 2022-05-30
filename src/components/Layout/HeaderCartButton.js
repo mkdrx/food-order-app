@@ -1,10 +1,13 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import CartContext from "../../store/cart-context";
 import CartIcon from "../Cart/CartIcon";
 import classes from "./HeaderCartButton.module.css";
 
 const HeaderCartButton = (props) => {
+  // State for button animation
+  const [btnIsHighlighted, setBtnIsHighlighted] = useState(false);
+
   // Using the context - by using useContext the HeaderCartButton will be reevaluated whenever the context changes (CartProvider)
   const cartCtx = useContext(CartContext);
 
@@ -15,8 +18,33 @@ const HeaderCartButton = (props) => {
     return currentNumber + item.amount;
   }, 0);
 
+  // Destructuring to use it in useEffect dependency
+  const { items } = cartCtx;
+
+  const btnClasses = `${classes.button} ${
+    btnIsHighlighted ? classes.bump : ""
+  }`;
+
+  // To make the button highlight based on following logic
+  useEffect(() => {
+    if (cartCtx.items.length === 0) {
+      return;
+    }
+    setBtnIsHighlighted(true);
+
+    // Timer for resetting highlight
+    const timer = setTimeout(() => {
+      setBtnIsHighlighted(false);
+    }, 300);
+
+    // Clean up function
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [items]);
+
   return (
-    <button className={classes.button} onClick={props.onClick}>
+    <button className={btnClasses} onClick={props.onClick}>
       <span className={classes.icon}>
         <CartIcon />
       </span>
