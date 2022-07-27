@@ -10,6 +10,12 @@ const Cart = (props) => {
   // State for the order button - checkout
   const [isCheckout, setIsCheckout] = useState(false);
 
+  // State for submission status
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // State for submission confirmation
+  const [didSubmit, setDidSubmit] = useState(false);
+
   // Using context
   const cartCtx = useContext(CartContext);
 
@@ -30,6 +36,26 @@ const Cart = (props) => {
 
   const orderHandler = () => {
     setIsCheckout(true);
+  };
+
+  const submitOrderHandler = async (userData) => {
+    // Set the state of submission as soon as the submit handler is called
+    setIsSubmitting(true);
+
+    // Send a POST req to the server with the user data and the ordered items
+    await fetch(
+      "https://react-http-4b011-default-rtdb.europe-west1.firebasedatabase.app/order.json",
+      {
+        method: "POST",
+        body: JSON.stringify({ user: userData, orderedItems: cartCtx.items }),
+      }
+    );
+    // Reset states after submission
+    setIsSubmitting(false);
+    setDidSubmit(true);
+
+    // Using cart context to clear the cart
+    cartCtx.clearCart();
   };
 
   const cartItems = (
@@ -61,15 +87,41 @@ const Cart = (props) => {
     </div>
   );
 
-  return (
-    <Modal onClose={props.onClose}>
+  // Cart content
+  const cartModalContent = (
+    <React.Fragment>
       {cartItems}
       <div className={classes.total}>
         <span>Total Amount</span>
         <span>{totalAmount}</span>
       </div>
-      {isCheckout && <Checkout onCancel={props.onClose} />}
+      {isCheckout && (
+        <Checkout onConfirm={submitOrderHandler} onCancel={props.onClose} />
+      )}
       {!isCheckout && modalActions}
+    </React.Fragment>
+  );
+
+  // Submitting content
+  const isSubmittingModalContent = <p>Sending order data...</p>;
+
+  // Confirmation content
+  const didSubmitModalContent = (
+    <React.Fragment>
+      <p>Order successfully sent!</p>
+      <div className={classes.actions}>
+        <button className={classes.button} onClick={props.onClose}>
+          Close
+        </button>
+      </div>
+    </React.Fragment>
+  );
+
+  return (
+    <Modal onClose={props.onClose}>
+      {!isSubmitting && !didSubmit && cartModalContent}
+      {isSubmitting && isSubmittingModalContent}
+      {!isSubmitting && didSubmit && didSubmitModalContent}
     </Modal>
   );
 };

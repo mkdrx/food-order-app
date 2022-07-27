@@ -54,6 +54,14 @@ const Checkout = (props) => {
     if (!formIsValid) {
       return;
     }
+
+    // To forward the user data
+    props.onConfirm({
+      name: enteredName,
+      street: enteredStreet,
+      postalCode: enteredPostal,
+      city: enteredCity,
+    });
   };
 
   // CSS control
