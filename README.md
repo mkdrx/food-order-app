@@ -1,4 +1,4 @@
-# React - Food App
+# React - Food Order App
 
 ## Based on Udemy's React Course - Maximilian Schwarzmüller
 
